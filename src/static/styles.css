@@ -162,4 +162,24 @@ footer {
   border-radius: 4px;
   font-size: 0.9em;
   color: #666;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-participant {
+  background: none;
+  border: none;
+  color: #ff4444;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: 8px;
+  border-radius: 50%;
+  line-height: 1;
+  transition: background-color 0.2s;
+}
+
+.delete-participant:hover {
+  background-color: rgba(255, 68, 68, 0.1);
 }

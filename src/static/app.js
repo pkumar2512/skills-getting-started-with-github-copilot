@@ -1,3 +1,37 @@
+// Function to show messages
+function showMessage(text, type) {
+  const messageDiv = document.getElementById("message");
+  messageDiv.textContent = text;
+  messageDiv.className = type;
+  messageDiv.classList.remove("hidden");
+  setTimeout(() => {
+    messageDiv.classList.add("hidden");
+  }, 5000);
+}
+
+// Function to unregister a participant
+async function unregisterParticipant(activityName, email) {
+  try {
+    const response = await fetch(`/activities/${activityName}/unregister`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to unregister participant');
+    }
+
+    // Refresh the activities list
+    await fetchActivities();
+    showMessage('Participant unregistered successfully', 'success');
+  } catch (error) {
+    showMessage(error.message, 'error');
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const activitiesList = document.getElementById("activities-list");
   const activitySelect = document.getElementById("activity");
@@ -21,11 +55,16 @@ document.addEventListener("DOMContentLoaded", () => {
         const spotsLeft = details.max_participants - details.participants.length;
 
         // Create participants list HTML
-        const participantsList = details.participants
-          .map(email => `<li>${email}</li>`)
-          .join('');
-
-        activityCard.innerHTML = `
+  const participantsList = details.participants
+    .map(email => `
+      <li>
+        ${email}
+        <button class="delete-participant" aria-label="Remove participant" 
+         onclick="unregisterParticipant('${name}', '${email}')">
+          ×
+        </button>
+      </li>
+    `).join('');        activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
@@ -73,6 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh the activities list to show the new participant
+        await fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
